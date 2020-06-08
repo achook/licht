@@ -10,17 +10,20 @@
 
 const char* ssid = "WAK 2.4";
 const char* password =  "Wietnam_2021";
+
 IPAddress ip(192,168,0,81);
 IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
+IPAddress dns_1(192,168,0,99);
+IPAddress dns_2(192,168,1,98);
 
-const char* mqtt_server = "192.168.0.99";
+const char* mqtt_server = "mqtt.server";
 const int mqtt_port = 1883;
 const char* mqtt_device = "device 2";
 const char* mqtt_user = "esp8266_2";
 const char* mqtt_password = "rCR7cLvKigWivyq6";
 const char* mqtt_topic = "device/2/mode";
-const char* mqtt_status_topic = "device/2/mode";
+const char* mqtt_status_topic = "device/2/status";
 
 WiFiClient wifi_client;
 PubSubClient mqtt_client(wifi_client);
@@ -46,7 +49,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(color_raw);
 
     color_t color;
-    unsigned int mask = 0xFF;
 
     color.blue = color_raw & 0b11111111;
     color.green = color_raw >> 8 & 0b11111111;
@@ -62,6 +64,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     led_mode = op_code;
 }
 
+static void make_status_message(char *status) {
+    long int color_raw;
+
+    color_raw = led_color.red;
+    color_raw <<= 8;
+    color_raw |= led_color.green;
+    color_raw <<= 8;
+    color_raw |= led_color.blue;
+
+    sprintf(status, "%x:%06lx", led_mode, color_raw);
+}
+
 void setup() {
     analogWriteFreq(PWM_FREQ);
     analogWriteRange(PWM_RANGE);
@@ -71,7 +85,9 @@ void setup() {
     
     Serial.print("Connecting to network: ");
     Serial.print(ssid);
-    WiFi.config(ip, gateway, subnet);
+    WiFi.config(ip, gateway, subnet, dns_1, dns_2);
+    // WiFi.config(ip, gateway, subnet);
+    WiFi.hostname("LED");
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -136,6 +152,10 @@ void loop() {
     }
 
     delay(10);
-    mqtt_client.publish(mqtt_status_topic, "OK");
+
+    char status[10];
+    make_status_message(status);
+    mqtt_client.publish(mqtt_status_topic, status);
+
     mqtt_client.loop();
 }
