@@ -11,11 +11,13 @@
 const char* ssid = "WAK 2.4";
 const char* password =  "Wietnam_2021";
 
+/*
 IPAddress ip(192,168,0,81);
 IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
 IPAddress dns_1(192,168,0,99);
 IPAddress dns_2(192,168,1,98);
+*/
 
 const char* mqtt_server = "mqtt.server";
 const int mqtt_port = 1883;
@@ -73,7 +75,7 @@ static void make_status_message(char *status) {
     color_raw <<= 8;
     color_raw |= led_color.blue;
 
-    sprintf(status, "%x:%06lx", led_mode, color_raw);
+    sprintf(status, "%02x:%06lx", led_mode, color_raw);
 }
 
 void setup() {
@@ -85,7 +87,7 @@ void setup() {
     
     Serial.print("Connecting to network: ");
     Serial.print(ssid);
-    WiFi.config(ip, gateway, subnet, dns_1, dns_2);
+    // WiFi.config(ip, gateway, subnet, dns_1, dns_2);
     // WiFi.config(ip, gateway, subnet);
     WiFi.hostname("LED");
     WiFi.begin(ssid, password);
