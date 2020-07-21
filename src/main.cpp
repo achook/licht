@@ -81,6 +81,9 @@ static void make_status_message(char *status) {
 void setup() {
     analogWriteFreq(PWM_FREQ);
     analogWriteRange(PWM_RANGE);
+    pinMode(12, OUTPUT);
+    pinMode(13, OUTPUT);
+    pinMode(14, OUTPUT);
 
     Serial.begin(9600);
     Serial.println("Serial monitor initialized");
@@ -151,7 +154,8 @@ void loop() {
         default:
             led_mode = 0;
             break;
-    }
+    } 
+
 
     delay(10);
 

@@ -12,15 +12,18 @@ typedef enum {
 void set_PWM(channel_t channel, int duty_cycle) {
     switch (channel) {
         case RED:
-        analogWrite(D5, duty_cycle);
+        if (!duty_cycle) digitalWrite(13, LOW);
+        else analogWrite(13, duty_cycle);
         break;
 
         case GREEN:
-        analogWrite(D6, duty_cycle);
+        if (!duty_cycle) digitalWrite(12, LOW);
+        else analogWrite(12, duty_cycle);
         break;
 
         case BLUE:
-        analogWrite(D7, duty_cycle);
+        if (!duty_cycle) digitalWrite(14, LOW);
+        else analogWrite(14, duty_cycle);
         break;
 
     }
